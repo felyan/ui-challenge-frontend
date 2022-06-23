@@ -1,25 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Admin from "./components/Admin";
+import Editor from "./components/Editor";
+import Home from "./components/Home";
+import Layout from "./components/Layout";
+import Lounge from "./components/Lounge";
+import Missing from "./components/Missing";
+import Unauthorized from "./components/Unauthorized";
+import RequireAuth from "./components/RequireAuth";
+import { Routes, Route } from "react-router-dom";
+
+
+const ROLES = {
+  User: 2001,
+  Editor: 1984,
+  Admin: 5150
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          {/* public routes */}
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="unauthorized" element={<Unauthorized />} />
+
+          {/* we want to protect these routes */}
+          <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+            <Route path="/" element={<Home />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Editor]} />}>
+            <Route path="editor" element={<Editor />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+            <Route path="admin" element={<Admin />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Editor, ROLES.Admin]} />}>
+            <Route path="Lounge" element={<Lounge />} />
+          </Route>
+
+          {/* catch all */}
+          <Route path="*" element={<Missing />} />
+        </Route>
+        </Routes>
   );
 }
 
